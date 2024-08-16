@@ -19,7 +19,7 @@
     padding-right: 1.2vw;
 }
 
-.lastbutton {
+.buttonPanel:last-child {
     padding-right: 0;
 }
 
@@ -37,16 +37,16 @@
     line-height: 2;
 }
 
-.right {
+.buttonAuthorization:last-child {
     border-left: solid 3px #b4ddd6;    
 }
 
-.right:hover {
+.buttonAuthorization:last-child:hover {
     border-radius: 0 5px 5px 0;
     background-color: antiquewhite;
 }
 
-.left:hover {
+.buttonAuthorization:first-child:hover {
     background-color: antiquewhite;
     border-radius: 5px 0 0 5px;
 }

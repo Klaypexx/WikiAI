@@ -1,20 +1,20 @@
-﻿import "./Menu.css"
+﻿import style from "./Menu.module.css"
 
 function Menu() {
     return(
-        <div className="menu">
-            <div className="menuPanel">
-                <a href="#" className="buttonPanel">Главная</a>
-                <a href="#" className="buttonPanel">Хранилище</a>
-                <a href="#" className="buttonPanel">Моё хранилище</a>
-                <a href="#" className="buttonPanel">Написать статью</a>
-                <a href="#" className="buttonPanel lastbutton">Поиск по LLM</a>
+        <nav className={style.menu}>
+            <div className={style.menuPanel}>
+                <a href="" className={style.buttonPanel}>Главная</a>
+                <a href="#" className={style.buttonPanel}>Хранилище</a>
+                <a href="#" className={style.buttonPanel}>Моё хранилище</a>
+                <a href="#" className={style.buttonPanel}>Написать статью</a>   
+                <a href="#" className={style.buttonPanel}>Поиск по LLM</a>
             </div>
-            <div className="menuAuthorization">
-                <a href="#" className="buttonAuthorization left">Log In</a>
-                <a href="#" className="buttonAuthorization right">Sign Up</a>
+            <div className={style.menuAuthorization}>
+                <a href="#" className={style.buttonAuthorization}>Log In</a>
+                <a href="#" className={style.buttonAuthorization}>Sign Up</a>
             </div>
-        </div>
+        </nav>
     );
 }
 

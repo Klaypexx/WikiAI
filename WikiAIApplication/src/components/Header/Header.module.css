@@ -3,7 +3,8 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    height: 55px;
+    height: auto;
+    padding-bottom: 15px;
     width: 100%;
     background-color: #c5c1c5fe;
     text-align: center;
