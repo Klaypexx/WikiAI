@@ -1,0 +1,40 @@
+.footer {
+    width: 100%;
+    background-color: #4e56ab29;
+}
+
+.footerMain {
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.footerInfo {
+    height: auto;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.infoHeader {
+    font-family: "Rubik", sans-serif;
+    color: #194853;
+}
+
+.infoText {
+    font-family: "Comfortaa", sans-serif;
+    color: #194853;
+    font-size: 16px;
+    line-height: 2rem;
+}
+
+.footer_icon {
+    width: 100px;
+    height: 30px;
+}

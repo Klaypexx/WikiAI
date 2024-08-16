@@ -1,0 +1,45 @@
+.main {
+    width: 100%;
+    height: auto;
+    background: linear-gradient(110deg, #23076b, #a958df66, #ffcb00, #4f4c7a);
+}
+
+.backgroundMain {
+    filter: blur(2px);
+    width: 1280px;
+    height: 700px;
+    background-image: url(../../resources/MainMenu/cover.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.bodyMain {
+    position: relative;
+    top: -1px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.bodyMainText {
+    max-width: 1280px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bodyTitle {
+    font-family: "Comfortaa", sans-serif;
+    color: #081538;
+}
+
+.bodyText {
+    font-family: "Nunito", sans-serif;
+    font-size: 20px;
+    width: 80%;
+    color: #081538;
+    text-align: center;
+}
