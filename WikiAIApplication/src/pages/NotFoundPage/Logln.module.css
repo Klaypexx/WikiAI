@@ -1,0 +1,31 @@
+.notFoundPage {
+    height: 100vh;
+    width: 100%;
+    background-image: url(../../resources/Backgrounds/SpaceDog.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+}
+
+.notFoundContainer {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: space-around;
+    justify-content: center;
+
+    background-color: #0000008a;
+    width: 60%;
+    height: 60vh;
+    border: solid 3px #c7a8a8;
+    border-radius: 3rem;
+    margin: 30px 0;
+}
+
+.mainTitle {
+    text-align: center;
+    font-size: 24px;
+    color: white;
+}

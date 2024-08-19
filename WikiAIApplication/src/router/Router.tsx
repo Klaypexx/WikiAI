@@ -6,7 +6,7 @@ import StoragePage from "../pages/StoragePage";
 import MyStoragePage from "../pages/MyStoragePage";
 import WriteStatePage from "../pages/WriteStatePage";
 import LLMSearchPage from "../pages/LLMSearchPage";
-import NotFoundPage from "../pages/NotFoundPage";
+import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import { createBrowserRouter } from 'react-router-dom';
 import App from "../App"
 
