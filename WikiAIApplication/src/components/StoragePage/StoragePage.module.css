@@ -1,0 +1,126 @@
+.storagePageWrapper {
+    display: flex;
+    height: auto;
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.storagePageImage {
+    padding: 16px;
+    width: 15px;
+    border-radius: 1em 0 0 1em;
+    border: 1px solid #8a5f5f;
+    background-image: url(/src/resources/StoragePage/findStoragePage.svg);
+    background-repeat: no-repeat;
+    background-size: 25px;
+    background-position: center;
+    position: relative;
+    left: 1px;
+}
+
+.storagePageSearch {
+    border: 1px solid #8a5f5f;
+    height: 30px;
+    width: 80%;
+    font-size: 18px;
+    font-weight: 400;
+    font-family: "Nunito", sans-serif;
+}
+
+.storagePageSearch:focus {
+    outline: none;
+}
+
+.storagePageButtonSearch {
+    width: 5rem;
+    height: 34px;
+    border-radius: 0 1em 1em 0;
+    border: 1px solid #8a5f5f;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: "Rubik", sans-serif;
+    position: relative;
+    right: 1px;
+    background-color: #a99b8b4a;
+    padding: 0 5px 0 0;;
+}
+
+.storagePageButtonSearch:hover {
+    background-color: #9f9f9fba;
+    border-color: #000000;
+}
+
+.storagePageButtonSearch:focus {
+    outline: none;
+}
+
+.storagePageMenu {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-evenly;
+}
+
+/* левая сторона */
+.storagePagePanel {
+    width: 17rem;
+    height: auto;
+    border: 1px solid #8a5f5f;
+    border-radius: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.catalogStoragePagePanel {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin-bottom: 20px;
+}
+
+.catalogHeader {
+    width: 100%;
+}
+
+.catalogSubject {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    border-top: 3px solid #c18633;
+    border-bottom: 3px solid #c18633;
+}
+
+.catalogHeader {
+    font-family: "Nunito", sans-serif;
+}
+
+.catalogTextSubject {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: "Nunito", sans-serif;
+    cursor: pointer;
+}
+
+.catalogTextSubject:hover {
+    color:#88a5de;
+    font-weight: 900;
+}
+/* правая сторона */
+.storagePageList {
+    width: 62rem;
+    height: 85vh;
+    border: 1px solid #8a5f5f;
+    border-radius: 2rem 2rem 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding-top: 1rem;
+}
