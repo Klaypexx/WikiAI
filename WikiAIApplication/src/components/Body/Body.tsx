@@ -5,8 +5,7 @@ function Body() {
     return(
         <div className={style.main}>
             <div className={container.container}>
-                <div className={style.bodyMain}>
-                    <div className={style.backgroundMain}></div>
+                <div className={style.backgroundMain}>
                     <div className={style.bodyMainText}>
                         <h1 className={style.bodyTitle}>Добро пожаловать в WikiAI</h1>
                         <p className={style.bodyText}>

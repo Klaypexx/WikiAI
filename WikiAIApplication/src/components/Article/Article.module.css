@@ -1,0 +1,57 @@
+/* Это исключительно фон для статьи, то есть стилизация, которую хочет видеть пользователь
+Я её выделил сейчас в отдельный класс css */
+.article {
+    width: 97%;
+    height: 10rem;
+    border: 1px solid #a65c24;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.backgroundArticle {
+    background-image: url(../../resources/Article/backgroundArticle.png);
+    background-size: 20vh;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100%;
+    width: 20%;
+    border-right: 2px solid #a65c24;
+}
+
+.articleBase {
+    width: 35%;
+    border-right: 2px solid #a65c24;
+    padding: 0 5px;
+    text-align: justify;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.articleHeader {
+    margin: 2px 0;
+    line-height: 1.6rem;
+    font-family: "Comfortaa", sans-serif;
+}
+
+.articleTheme {
+    font-family: "Nunito", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 3px 0;
+}
+
+.articleDescription {
+    width: 53%;
+    padding: 0 5px;
+    text-align: justify;
+}
+
+.articleText {
+    margin: 5px 0;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: "Comfortaa", sans-serif;
+}
