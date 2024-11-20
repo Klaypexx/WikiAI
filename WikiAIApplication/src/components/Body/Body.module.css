@@ -1,11 +1,12 @@
 .main {
+    height: 100%;
     width: 100%;
     background: linear-gradient(110deg, #23076b, #a958df66, #ffcb00, #4f4c7a);
 }
 
 .backgroundMain {
     width: 1280px;
-    height: 70vh;
+    height: 78vh;
     background-image: url(../../resources/MainMenu/backgroundHome.png);
     background-repeat: no-repeat;
     background-size: cover;

@@ -5,7 +5,6 @@ import HomePage from "../pages/HomePage";
 import StoragePage from "../pages/StoragePage";
 import MyStoragePage from "../pages/MyStoragePage";
 import WriteStatePage from "../pages/WriteStatePage/WriteStatePage";
-import LLMSearchPage from "../pages/LLMSearchPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import { createBrowserRouter } from 'react-router-dom';
 import App from "../App"
@@ -30,10 +29,6 @@ const Router = createBrowserRouter([
         {
           path: '/write_state',
           element: <WriteStatePage />,
-        },
-        {
-          path: '/LLMSearch',
-          element: <LLMSearchPage />,
         },
         {
           path: '/SignUp',
