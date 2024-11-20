@@ -1,7 +1,7 @@
 import style from "./SignUpForm.module.css";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
+//import axios from 'axios';
 
 const SignUpForm = () => {
     const formik = useFormik({
@@ -27,8 +27,8 @@ const SignUpForm = () => {
         }),
         onSubmit: async (values) => {
           try {
-            const response = await axios.post('/API/Register', values);
-            console.log('Server response:', response.data);
+            //const response = await axios.post('/API/Register', values);
+            //console.log('Server response:', response.data);
             alert('User registered successfully');
           } catch (error) {
             console.error('Error registering user:', error);

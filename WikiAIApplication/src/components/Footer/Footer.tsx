@@ -12,7 +12,6 @@ function Body() {
                             <h2 className={style.infoHeader}>Разработчики:</h2>
                             <p className={style.infoText}>
                                 Черепов Даниил<br/>
-                                Морозов Дмитрий<br/>
                                 Шереметьев Павел
                             </p>
                         </div>
