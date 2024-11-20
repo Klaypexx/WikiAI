@@ -4,7 +4,7 @@ import LogIn from "../pages/LogIn/LogIn";
 import HomePage from "../pages/HomePage";
 import StoragePage from "../pages/StoragePage";
 import MyStoragePage from "../pages/MyStoragePage";
-import WriteStatePage from "../pages/WriteStatePage";
+import WriteStatePage from "../pages/WriteStatePage/WriteStatePage";
 import LLMSearchPage from "../pages/LLMSearchPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import { createBrowserRouter } from 'react-router-dom';

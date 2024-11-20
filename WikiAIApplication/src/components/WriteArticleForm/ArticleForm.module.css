@@ -1,0 +1,91 @@
+.pageСontainer {
+    display: flex;
+    flex-direction: column;
+    margin: 0 30px;
+    font-size: 1.2rem;
+    font-family: "Nunito", sans-serif;
+    font-weight: 550px;
+}
+
+.articleFormСontainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.subformLabel {
+    line-height: 3rem;
+}
+
+.formTitleInput {
+    width: 50%;
+    background: #f5f5dc;
+    font-size: 1.2rem;
+    font-family: "Nunito", sans-serif;
+}
+
+.formTextInput {
+    width: 80%;
+    height:500px;
+    background: #f5f5dc;
+    font-size: 1.2rem;
+    font-family: "Nunito", sans-serif;
+}
+
+.submitButton {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+    background-color:chocolate;
+    font-family: "Rubik", sans-serif;
+}
+
+.errorMsg {
+    font-weight: bold;
+}
+ 
+.imageUploadContainer {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border: 2px dashed black;
+    cursor: pointer;
+}
+  
+.previewImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+  
+.hiddenFileInput {
+    display: none;
+}
+
+.themesContainer {
+    margin-right: 100px;
+    height: auto;
+    border: 1px solid #8a5f5f;
+    border-radius: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.themesWrapper {
+    margin: 0 20px;
+}
+
+.formContainer {
+    border: 1px solid #8a5f5f;
+    border-radius: 2rem;
+    width: 1200px;
+}
+
+.subformContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.formWrapper {
+    margin: 20px 20px
+}
