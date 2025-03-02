@@ -1,11 +1,12 @@
 import style from "./Article.module.css"
+import { Link } from 'react-router-dom';
 
 function Article() {
     return (
         <div className={style.article} >
             <div className={style.backgroundArticle}></div>
             <div className={style.articleBase}>
-                <h3 className={style.articleHeader}>Пажилая статья об искусственном интеллигентике</h3>
+                <Link to = "/article" className={style.articleHeader}>Пажилая статья об искусственном интеллигентике</Link>
                 <p className={style.articleTheme}>Набор тематик /пример: Медицина + мехатроника + биология/</p>                
             </div>
             <div className={style.articleDescription}>

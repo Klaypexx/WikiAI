@@ -99,7 +99,7 @@ const WriteArticleForm: React.FC = () => {
                   <div className={style.themesContainer}>
                     <label>Темы</label>
                     <FieldArray name="themes">
-                        {({ push }) => (
+                        {({ }) => (
                             <div className={style.themesWrapper}>
                                 <div className="themes-list">
                                     {themes.map((theme) => (

@@ -6,6 +6,7 @@ import StoragePage from "../pages/StoragePage";
 import MyStoragePage from "../pages/MyStoragePage";
 import WriteStatePage from "../pages/WriteStatePage/WriteStatePage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
+import ArticlePage from "../pages/ArticlePage/ArticlePage";
 import { createBrowserRouter } from 'react-router-dom';
 import App from "../App"
 
@@ -37,6 +38,10 @@ const Router = createBrowserRouter([
         {
           path: '/LogIn',
           element: <LogIn/>,
+        },
+        {
+          path: '/article',
+          element: <ArticlePage />,
         },
         {
           path: '*',

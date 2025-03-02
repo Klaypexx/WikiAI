@@ -1,9 +1,12 @@
 import style from "./SignUpForm.module.css";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-//import axios from 'axios';
+import axios from 'axios';
+import { useState } from 'react';
 
 const SignUpForm = () => {
+    const [loginError, setLoginError] = useState('');
+
     const formik = useFormik({
         initialValues: {
           name: '',
@@ -27,12 +30,24 @@ const SignUpForm = () => {
         }),
         onSubmit: async (values) => {
           try {
-            //const response = await axios.post('/API/Register', values);
-            //console.log('Server response:', response.data);
-            alert('User registered successfully');
+            // Проверка, существования пользователя с таким логином
+            const checkUserResponse = await axios.post('http://localhost:3001/check-user', {
+              login: values.login,
+            });
+    
+            if (checkUserResponse.data.exists) {
+              // Если пользователь существует, устанавливаем ошибку
+              setLoginError('Пользователь с таким логином уже существует');
+            } else {
+              // Если пользователь не существует, регистрируем его
+              const registerResponse = await axios.post('http://localhost:3001/register', values);
+              console.log('Пользователь успешно зарегистрирован:', registerResponse.data);
+              setLoginError('');
+              alert('Регистрация прошла успешно!');
+            }
           } catch (error) {
-            console.error('Error registering user:', error);
-            alert('Error registering user');
+            console.error('Ошибка при регистрации:', error);
+            alert('Произошла ошибка при регистрации');
           }
         },
       });
@@ -66,10 +81,11 @@ const SignUpForm = () => {
         {formik.touched.login && formik.errors.login ? (
           <div>{formik.errors.login}</div>
         ) : null}
+        {loginError && <div>{loginError}</div>} {/* Отображаем ошибку логина */}
 
         <label className={style.signUpLabel} htmlFor="password">Пароль:</label>
         <input
-          type="text"
+          type="password"
           className={style.signUpInput}
           id="password"
           name="password"
