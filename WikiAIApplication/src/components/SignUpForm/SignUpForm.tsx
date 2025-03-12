@@ -30,26 +30,33 @@ const SignUpForm = () => {
         }),
         onSubmit: async (values) => {
           try {
-            // Проверка, существования пользователя с таким логином
             const checkUserResponse = await axios.post('http://localhost:3001/check-user', {
               login: values.login,
+            }, {
+              headers: {
+                'Content-Type': 'application/json', // Убедитесь, что заголовок установлен
+              },
             });
-    
+        
             if (checkUserResponse.data.exists) {
               // Если пользователь существует, устанавливаем ошибку
               setLoginError('Пользователь с таким логином уже существует');
             } else {
               // Если пользователь не существует, регистрируем его
-              const registerResponse = await axios.post('http://localhost:3001/register', values);
+              const registerResponse = await axios.post('http://localhost:3001/register', values, {
+                headers: {
+                  'Content-Type': 'application/json', // Убедитесь, что заголовок установлен
+                },
+              });
               console.log('Пользователь успешно зарегистрирован:', registerResponse.data);
               setLoginError('');
               alert('Регистрация прошла успешно!');
             }
           } catch (error) {
-            console.error('Ошибка при регистрации:', error);
-            alert('Произошла ошибка при регистрации');
-          }
-        },
+              console.error('Ошибка при регистрации:', error);
+              alert('Произошла ошибка при регистрации');
+            }
+            }, 
       });
 
     return(
