@@ -3,9 +3,11 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { useState } from 'react';
+import { useUser } from '../../Context/UserContext';
 
 const SignUpForm = () => {
     const [loginError, setLoginError] = useState('');
+    const { userId, setUserId } = useUser();
 
     const formik = useFormik({
         initialValues: {
@@ -34,7 +36,7 @@ const SignUpForm = () => {
               login: values.login,
             }, {
               headers: {
-                'Content-Type': 'application/json', // Убедитесь, что заголовок установлен
+                'Content-Type': 'application/json',
               },
             });
         
@@ -45,9 +47,24 @@ const SignUpForm = () => {
               // Если пользователь не существует, регистрируем его
               const registerResponse = await axios.post('http://localhost:3001/register', values, {
                 headers: {
-                  'Content-Type': 'application/json', // Убедитесь, что заголовок установлен
+                  'Content-Type': 'application/json',
                 },
               });
+
+              const getUserId = await axios.post('http://localhost:3001/get-id', {
+                login: values.login,
+              }, {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+              if (getUserId.data.exists) {
+                setUserId(getUserId.data.id);
+              }
+              else {
+                alert('Произошла ошибка на сервере')
+              }
+              
               console.log('Пользователь успешно зарегистрирован:', registerResponse.data);
               setLoginError('');
               alert('Регистрация прошла успешно!');
@@ -56,7 +73,7 @@ const SignUpForm = () => {
               console.error('Ошибка при регистрации:', error);
               alert('Произошла ошибка при регистрации');
             }
-            }, 
+          }, 
       });
 
     return(
