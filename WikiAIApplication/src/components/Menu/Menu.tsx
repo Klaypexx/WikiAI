@@ -1,7 +1,10 @@
 ﻿import style from "./Menu.module.css"
 import { Link } from 'react-router-dom';
+import { useAuth } from '../AuthContext/AuthContext'; // Импортируем useAuth
 
 function Menu() {
+    const { isAuthenticated, logout } = useAuth(); // Используем контекст
+
     return(
         <nav className={style.menu}>
             <div className={style.menuPanel}>
@@ -10,10 +13,18 @@ function Menu() {
                 <Link to = "/my_storage" className={style.buttonPanel}>Моё хранилище</Link>
                 <Link to = "/write_state" className={style.buttonPanel}>Написать статью</Link>   
             </div>
-            <div className={style.menuAuthorization}>
-                <Link to = "/LogIn" className={style.buttonAuthorization}>Log In</Link>
-                <Link to = "/SignUp" className={style.buttonAuthorization}>Sign Up</Link>
-            </div>
+            {isAuthenticated ? ( // Условный рендеринг
+                <div className={style.menuUserAuthorization}>
+                <div className={style.menuUser}>login</div>
+                <div className={style.menuUser}>image</div>
+                <button onClick={logout}>Выйти</button> {/* Кнопка выхода */}
+                </div>
+            ) : (
+                <div className={style.menuAuthorization}>
+                <Link to="/LogIn" className={style.buttonAuthorization}>Log In</Link>
+                <Link to="/SignUp" className={style.buttonAuthorization}>Sign Up</Link>
+                </div>
+            )}
         </nav>
     );
 }

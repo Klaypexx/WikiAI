@@ -9,7 +9,7 @@ function Header() {
             <div className={container.container}>
                 <div className={style.headerMain}>
                     <img src={icon} alt="WikiAI" className={style.header_icon}/>
-                    <Menu/>
+                       <Menu/> 
                 </div>
             </div>
         </div>

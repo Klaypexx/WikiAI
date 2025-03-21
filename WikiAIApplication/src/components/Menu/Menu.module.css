@@ -55,3 +55,17 @@
     background-color: antiquewhite;
     border-radius: 5px 0 0 5px;
 }
+
+.menuUser {
+    font-family: "Rubik", sans-serif;
+    padding: 3px 8px;
+    font-size: 15px;
+    line-height: 2;
+}
+
+.menuUserAuthorization {
+    display: flex;
+    border: solid 3px #b4ddd6;
+    border-radius: 7px;
+    flex-wrap: nowrap;
+}

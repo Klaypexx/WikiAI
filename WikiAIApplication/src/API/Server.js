@@ -35,6 +35,10 @@ app.get('/data', (req, res) => {
   });
 });
 
+<<<<<<< Updated upstream
+=======
+// Проверка существования пользователя
+>>>>>>> Stashed changes
 app.post('/check-user', (req, res) => {
   console.log('Тело запроса:', req.body); // Логирование тела запроса
   const { login } = req.body;
