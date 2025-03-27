@@ -4,10 +4,12 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import { useAuth } from '../AuthContext/AuthContext'; // Импортируем useAuth
 import { useNavigate } from 'react-router-dom'; // Импортируем useNavigateм
+import { useUser } from '../../Context/UserContext';
 
 const LogInForm = () => {
 	const { login } = useAuth(); // Используем контекст
 	const navigate = useNavigate(); // Хук для навигации
+	const { userId, setUserId } = useUser();
 
 	const formik = useFormik({
 		initialValues: {
@@ -34,10 +36,23 @@ const LogInForm = () => {
 
 				if (checkUserResponse.data.exists) {
 					console.log('Пользователь существует');
+                    const getUserId = await axios.post('http://localhost:3001/get-id', {
+						login: values.login,
+					  }, {
+						headers: {
+						  'Content-Type': 'application/json',
+						},
+					  });
+					  if (getUserId.data.exists) {
+						setUserId(getUserId.data.id);
+					  }
+					  else {
+						alert('Произошла ошибка на сервере')
+					  }
 					login();//метод AuthContext (чото там делает крч)
 					navigate('/my_storage'); // Перенаправляем на /my_storage
 				} else {
-					console.log('Пользователь нет существует');
+					console.log('Пользователь не существует');
 					alert('Пользователь не существует');
 				}
 			} catch(error) {
