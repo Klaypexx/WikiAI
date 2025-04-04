@@ -1,16 +1,15 @@
-.articlePpage {
+.articlePage {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
   .articleTitle {
     font-size: 2rem;
-    color: #333;
+    color: #fff;
     text-align: center;
     margin-bottom: 20px;
   }
@@ -18,7 +17,7 @@
   .articleContent {
     font-size: 1.1rem;
     line-height: 1.6;
-    color: #555;
+    color: #fff;
     margin-bottom: 30px;
     min-height: 400px;
   }
@@ -31,7 +30,7 @@
   }
   
   .commentInput {
-    width: 100%;
+    width: 97%;
     height: 100px;
     padding: 10px;
     font-size: 1rem;
@@ -55,10 +54,11 @@
     background-color: #0056b3;
   }
   
-  .commentsList {
+  .commentList {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    color: #fff;
   }
   
   .commentsList h3 {
@@ -69,7 +69,7 @@
   
   .commentItem {
     padding: 10px;
-    background-color: #fff;
+    background-color: #ffffff6e;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

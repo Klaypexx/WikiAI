@@ -28,6 +28,8 @@
     font-size: 18px;
     font-weight: 400;
     font-family: "Nunito", sans-serif;
+    color: #081538;
+    background: #dadada;
 }
 
 .storagePageSearch:focus {

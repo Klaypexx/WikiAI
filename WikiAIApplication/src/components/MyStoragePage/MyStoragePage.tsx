@@ -1,7 +1,52 @@
 import style from "./MyStoragePage.module.css"
 import Article from "../Article/Article"
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useUser } from '../../Context/UserContext'
+
+interface Article {
+    id: number;
+    title: string;
+    content: string;
+  }
 
 function MyStorage () {
+    const { userId } = useUser(); // Получаем userId из контекста
+    const [articles, setArticles] = useState<Article[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+      if (!userId) {
+        setLoading(false);
+        return;
+    }
+
+    const fetchArticles = async () => {
+      try {
+        const response = await axios.get<Article[]>(`http://localhost:3001/my-articles?userId=${userId}`);
+        setArticles(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Ошибка при загрузке статей:', err);
+        setError('Не удалось загрузить статьи');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+      fetchArticles();
+    }, [userId]);
+
+    if (loading) {
+      return <div>Загрузка...</div>;
+    }
+
+    if (error) {
+      return <div style={{ color: 'red' }}>{error}</div>;
+    }
+
+
     return(
         <>
             <div className={style.storagePageWrapper}>
