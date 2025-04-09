@@ -26,19 +26,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('isAuthenticated'); // Удаляем из localStorage 
+    localStorage.removeItem('authToken'); // Удаляем токен при выходе
     navigate('/');
   };
 
-  useEffect(() => {//очищаем локальное хранение при закрытии браузера
-    const handleBeforeUnload = () => {
-      localStorage.removeItem('isAuthenticated');
-    };
+  // useEffect(() => {//очищаем локальное хранение при закрытии браузера
+  //   const handleBeforeUnload = () => {
+  //     localStorage.removeItem('isAuthenticated');
+  //   };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
+  //   window.addEventListener('beforeunload', handleBeforeUnload);
+  //   return () => {
+  //     window.removeEventListener('beforeunload', handleBeforeUnload);
+  //   };
+  // }, []);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>

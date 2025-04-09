@@ -45,6 +45,8 @@ const LogInForm = () => {
 					  });
 					  if (getUserId.data.exists) {
 						setUserId(getUserId.data.id);
+						// Сохраняем токен (в данном случае используем id как токен)
+						localStorage.setItem('authToken', getUserId.data.id.toString());
 					  }
 					  else {
 						alert('Произошла ошибка на сервере')
