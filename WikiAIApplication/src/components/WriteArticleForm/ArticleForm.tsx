@@ -49,7 +49,8 @@ const WriteArticleForm: React.FC = () => {
         formData.append('author', userId.toString());
       }
       // Добавляем каждую тему отдельно
-      values.themes.forEach(theme => formData.append('themes', theme.toString()));
+      //values.themes.forEach(theme => formData.append('themes', theme.toString()));
+      formData.append('themes', values.themes.join(','));
       
       //values.themes.forEach(themeId => {
        // formData.append('themes[]', themeId.toString());

@@ -171,15 +171,18 @@ app.post('/post-article', upload.single('preview'), (req, res) => {
   // Если themes пришло как строка (например, "1,2,3")
   if (typeof themes === 'string') {
     themes = themes.split(',').map(id => parseInt(id.trim()));
+    console.log('themes string')
   } 
   // Если themes пришло как массив в FormData (themes[]=1&themes[]=2)
   else if (req.body['themes[]']) {
     themes = Array.isArray(req.body['themes[]']) 
       ? req.body['themes[]'].map(id => parseInt(id))
       : [parseInt(req.body['themes[]'])];
+    console.log('themes array')
   }
   // Если themes не пришло
   else {
+    console.log('not themes')
     themes = [];
   }
 
