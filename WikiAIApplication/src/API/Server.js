@@ -171,18 +171,15 @@ app.post('/post-article', upload.single('preview'), (req, res) => {
   // Если themes пришло как строка (например, "1,2,3")
   if (typeof themes === 'string') {
     themes = themes.split(',').map(id => parseInt(id.trim()));
-    console.log('themes string')
   } 
   // Если themes пришло как массив в FormData (themes[]=1&themes[]=2)
   else if (req.body['themes[]']) {
     themes = Array.isArray(req.body['themes[]']) 
       ? req.body['themes[]'].map(id => parseInt(id))
       : [parseInt(req.body['themes[]'])];
-    console.log('themes array')
   }
   // Если themes не пришло
   else {
-    console.log('not themes')
     themes = [];
   }
 
@@ -292,6 +289,195 @@ app.use((err, req, res, next) => {
     console.error(err);
     res.status(500).json({ error: 'Внутренняя ошибка сервера' });
   }
+});
+
+//для получения всех существующих статей
+app.get('/articles', (req, res) => {
+  const query = `
+    SELECT 
+      a.id, 
+      a.title, 
+      a.text, 
+      a.date_of_publication, 
+      a.author_id, 
+      a.rating,
+      GROUP_CONCAT(t.name SEPARATOR ', ') AS themes
+    FROM 
+      article_in_storage a
+    LEFT JOIN 
+      article_have_topic aht ON a.id = aht.article_id
+    LEFT JOIN 
+      topics t ON aht.theme_id = t.id
+    GROUP BY 
+      a.id
+    ORDER BY 
+      a.date_of_publication DESC
+  `;
+
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.error('Ошибка при получении статей:', error);
+      return res.status(500).json({ error: 'Ошибка при получении статей' });
+    }
+
+    // Преобразуем строку с темами в массив
+    const articles = results.map(article => ({
+      ...article,
+      themes: article.themes ? article.themes.split(', ') : []
+    }));
+
+    res.json(articles);
+  });
+});
+
+// Маршрут для получения конкретной статьи по ID (заполняем ArticlePage)
+app.get('/articles/:id', (req, res) => {
+  const articleId = req.params.id;
+
+  const query = `
+      SELECT 
+          a.id, 
+          a.title, 
+          a.text, 
+          a.date_of_publication, 
+          a.author_id, 
+          a.rating,
+          GROUP_CONCAT(t.name SEPARATOR ', ') AS themes
+      FROM 
+          article_in_storage a
+      LEFT JOIN 
+          article_have_topic aht ON a.id = aht.article_id
+      LEFT JOIN 
+          topics t ON aht.theme_id = t.id
+      WHERE 
+          a.id = ?
+      GROUP BY 
+          a.id
+  `;
+
+  connection.query(query, [articleId], (error, results) => {
+      if (error) {
+          console.error('Ошибка при получении статьи:', error);
+          return res.status(500).json({ error: 'Ошибка при получении статьи' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ error: 'Статья не найдена' });
+      }
+
+      const article = {
+          ...results[0],
+          themes: results[0].themes ? results[0].themes.split(', ') : []
+      };
+
+      res.json(article);
+  });
+});
+
+// Маршрут для проверки авторизации
+app.get('/check-auth', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Токен не предоставлен' });
+  }
+
+  // Проверяем, что пользователь с таким ID существует
+  connection.query(
+    'SELECT id, name FROM user WHERE id = ?', 
+    [token],
+    (error, results) => {
+      if (error) {
+        console.error('Ошибка проверки авторизации:', error);
+        return res.status(500).json({ error: 'Ошибка сервера' });
+      }
+      if (results.length === 0) {
+        return res.status(401).json({ error: 'Неверный токен' });
+      }
+      res.json(results[0]);
+    }
+  );
+});
+// app.get('/check-auth', (req, res) => {
+//   const token = req.headers.authorization?.split(' ')[1];
+//   if (!token) {
+//     return res.status(401).json({ error: 'Токен не предоставлен' });
+//   }
+
+//   // Здесь должна быть ваша логика проверки токена
+//   // Это пример - в реальном приложении используйте JWT или другую систему аутентификации
+//   connection.query(
+//     'SELECT id, name FROM user WHERE id = ?', 
+//     [token], // В реальном приложении токен должен быть расшифрован
+//     (error, results) => {
+//       if (error) {
+//         console.error('Ошибка проверки авторизации:', error);
+//         return res.status(500).json({ error: 'Ошибка сервера' });
+//       }
+//       if (results.length === 0) {
+//         return res.status(401).json({ error: 'Неверный токен' });
+//       }
+//       res.json(results[0]);
+//     }
+//   );
+// });
+
+// Маршрут для получения комментариев статьи
+app.get('/articles/:id/comments', (req, res) => {
+  const articleId = req.params.id;
+
+  const query = `
+    SELECT 
+      c.id, 
+      c.userId, 
+      u.name as userName, 
+      c.text,
+      NOW() as createdAt
+    FROM comments c
+    JOIN user u ON c.userId = u.id
+    WHERE c.articleId = ?
+    ORDER BY c.id DESC
+  `;
+
+  connection.query(query, [articleId], (error, results) => {
+    if (error) {
+      console.error('Ошибка при получении комментариев:', error);
+      return res.status(500).json({ error: 'Ошибка при получении комментариев' });
+    }
+    res.json(results);
+  });
+});
+
+// Маршрут для добавления комментария
+app.post('/articles/:id/comments', (req, res) => {
+  const articleId = req.params.id;
+  const { text, userId } = req.body;
+
+  if (!text || !userId) {
+    return res.status(400).json({ error: 'Текст комментария и ID пользователя обязательны' });
+  }
+
+  // Убираем createdAt из запроса
+  const query = `
+    INSERT INTO comments (userId, text, articleId)
+    VALUES (?, ?, ?)
+  `;
+
+  connection.query(query, [userId, text, articleId], (error, results) => {
+    if (error) {
+      console.error('Ошибка при добавлении комментария:', error);
+      return res.status(500).json({ error: 'Ошибка при добавлении комментария' });
+    }
+
+    // Возвращаем данные без createdAt, генерируем дату на сервере
+    res.status(201).json({
+      id: results.insertId,
+      userId,
+      text,
+      articleId,
+      // Добавляем дату на стороне сервера
+      createdAt: new Date().toISOString()
+    });
+  });
 });
 
 // Запуск сервера
