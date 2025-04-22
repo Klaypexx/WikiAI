@@ -116,13 +116,37 @@ app.get('/my-articles', (req, res) => {
     return res.status(400).json({ error: 'userId не указан' });
   }
 
-  connection.query('SELECT * FROM articles WHERE userId = ?', [userId], (error, results) => {
+  const query = `
+    SELECT 
+      a.id, 
+      a.title, 
+      a.text, 
+      GROUP_CONCAT(t.name SEPARATOR ', ') AS themes
+    FROM 
+      article_in_storage a
+    LEFT JOIN 
+      article_have_topic aht ON a.id = aht.article_id
+    LEFT JOIN 
+      topics t ON aht.theme_id = t.id
+    WHERE 
+      a.author_id = ?
+    GROUP BY 
+      a.id
+  `;
+
+  connection.query(query, [userId], (error, results) => {
     if (error) {
       console.error('Ошибка при выполнении запроса:', error);
       return res.status(500).json({ error: 'Ошибка при получении статей' });
     }
 
-    res.json(results);
+    // Преобразуем строку с темами в массив
+    const articles = results.map(article => ({
+      ...article,
+      themes: article.themes ? article.themes.split(', ') : []
+    }));
+
+    res.json(articles);
   });
 });
 
@@ -397,29 +421,6 @@ app.get('/check-auth', (req, res) => {
     }
   );
 });
-// app.get('/check-auth', (req, res) => {
-//   const token = req.headers.authorization?.split(' ')[1];
-//   if (!token) {
-//     return res.status(401).json({ error: 'Токен не предоставлен' });
-//   }
-
-//   // Здесь должна быть ваша логика проверки токена
-//   // Это пример - в реальном приложении используйте JWT или другую систему аутентификации
-//   connection.query(
-//     'SELECT id, name FROM user WHERE id = ?', 
-//     [token], // В реальном приложении токен должен быть расшифрован
-//     (error, results) => {
-//       if (error) {
-//         console.error('Ошибка проверки авторизации:', error);
-//         return res.status(500).json({ error: 'Ошибка сервера' });
-//       }
-//       if (results.length === 0) {
-//         return res.status(401).json({ error: 'Неверный токен' });
-//       }
-//       res.json(results[0]);
-//     }
-//   );
-// });
 
 // Маршрут для получения комментариев статьи
 app.get('/articles/:id/comments', (req, res) => {
