@@ -68,14 +68,6 @@
   margin-bottom: 10px;
 }
 
-/* .commentItem {
-  padding: 10px;
-  background-color: #ffffff6e;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-} */
-
 .commentItem {
   padding: 15px;
   margin-bottom: 15px;
@@ -97,4 +89,38 @@
   color: #adb5bd;
   font-size: 0.8rem;
   text-align: right;
+}
+
+/* добавил */
+.commentRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.commentRating button {
+  background: none;
+  border: 1px solid #4dabf7;
+  color: #4dabf7;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.commentRating button:hover {
+  background-color: rgba(77, 171, 247, 0.1);
+}
+
+.commentRating button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: rgba(77, 171, 247, 0.3);
+}
+
+.commentRating span {
+  min-width: 20px;
+  text-align: center;
+  font-weight: bold;
 }

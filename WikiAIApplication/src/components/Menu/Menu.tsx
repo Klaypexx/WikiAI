@@ -1,9 +1,21 @@
 ﻿import style from "./Menu.module.css"
 import { Link } from 'react-router-dom';
-import { useAuth } from '../AuthContext/AuthContext'; // Импортируем useAuth
+import { useAuth } from '../AuthContext/AuthContext';
+import { useEffect, useState } from 'react';
 
 function Menu() {
-    const { isAuthenticated, logout } = useAuth(); // Используем контекст
+    const { isAuthenticated, logout } = useAuth();
+    const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            // Получаем имя пользователя из localStorage
+            const name = localStorage.getItem('userName');
+            if (name) {
+                setUserName(name);
+            }
+        }
+    }, [isAuthenticated]);
 
     return(
         <nav className={style.menu}>
@@ -15,8 +27,7 @@ function Menu() {
             </div>
             {isAuthenticated ? ( // Условный рендеринг
                 <div className={style.menuUserAuthorization}>
-                <div className={style.menuUser}>login</div>
-                <div className={style.menuUser}>image</div>
+                <div className={style.menuUser}>{userName}</div>
                 <button onClick={logout}>Выйти</button> {/* Кнопка выхода */}
                 </div>
             ) : (

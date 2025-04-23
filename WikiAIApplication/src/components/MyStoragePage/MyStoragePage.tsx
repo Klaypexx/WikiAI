@@ -9,6 +9,7 @@ interface Article {
     title: string;
     text: string;
     themes?: string[];
+    preview_path?: string;
   }
 
 function MyStorage () {
@@ -99,9 +100,10 @@ function MyStorage () {
                         <h3 className={style.catalogHeader}>Тематика:</h3>
                         <div className={style.catalogSubject}>
                           {[
-                                "История", "Космология", "Биология", "Математика",
-                                "Программирование", "Дизайн", "Социология", "Философия",
-                                "Машиностроение", "Мехатроника", "Кулинария", "Медицина"
+                              "История", "Технологии", "Косметология", "Биология", "Математика",
+                              "Программирование", "Наука", "Дизайн", "Социология", "Философия",
+                              "Машиностроение", "Мехатроника", "Кулинария", "Медицина",
+                              "Здоровье", "Образование"
                             ].map(theme => (
                                 <span 
                                     key={theme}
@@ -125,6 +127,7 @@ function MyStorage () {
                                 title={article.title}
                                 text={article.text}
                                 themes={article.themes || []}
+                                previewPath={article.preview_path}
                             />
                         ))
                     ) : (

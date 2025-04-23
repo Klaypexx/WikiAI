@@ -60,6 +60,28 @@ app.post('/check-user', (req, res) => {
   });
 });
 
+// Добавляем маршрут для получения данных пользователя
+app.post('/get-user', (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: 'ID пользователя обязательно' });
+  }
+
+  connection.query('SELECT name FROM user WHERE id = ?', [id], (error, results) => {
+    if (error) {
+      console.error('Ошибка при получении пользователя:', error);
+      return res.status(500).json({ error: 'Ошибка при получении пользователя' });
+    }
+    
+    if (results.length > 0) {
+      res.json({ name: results[0].name });
+    } else {
+      res.status(404).json({ error: 'Пользователь не найден' });
+    }
+  });
+});
+
 app.post('/get-id', (req, res) => {
   console.log('Тело запроса:', req.body); // Логирование тела запроса
   const { login } = req.body;
@@ -109,6 +131,7 @@ app.post('/register', (req, res) => {
   );
 });
 
+//статьи конкретного пользователя
 app.get('/my-articles', (req, res) => {
   const { userId } = req.query;
 
@@ -117,21 +140,22 @@ app.get('/my-articles', (req, res) => {
   }
 
   const query = `
-    SELECT 
-      a.id, 
-      a.title, 
-      a.text, 
-      GROUP_CONCAT(t.name SEPARATOR ', ') AS themes
-    FROM 
-      article_in_storage a
-    LEFT JOIN 
-      article_have_topic aht ON a.id = aht.article_id
-    LEFT JOIN 
-      topics t ON aht.theme_id = t.id
-    WHERE 
-      a.author_id = ?
-    GROUP BY 
-      a.id
+  SELECT 
+    a.id, 
+    a.title, 
+    a.text, 
+    GROUP_CONCAT(DISTINCT t.name SEPARATOR ', ') AS themes,
+    (SELECT ap.file_path FROM article_preview ap WHERE ap.article_id = a.id LIMIT 1) AS preview_path
+  FROM 
+    article_in_storage a
+  LEFT JOIN 
+    article_have_topic aht ON a.id = aht.article_id
+  LEFT JOIN 
+    topics t ON aht.theme_id = t.id
+  WHERE 
+    a.author_id = ?
+  GROUP BY 
+    a.id, a.title, a.text
   `;
 
   connection.query(query, [userId], (error, results) => {
@@ -140,7 +164,6 @@ app.get('/my-articles', (req, res) => {
       return res.status(500).json({ error: 'Ошибка при получении статей' });
     }
 
-    // Преобразуем строку с темами в массив
     const articles = results.map(article => ({
       ...article,
       themes: article.themes ? article.themes.split(', ') : []
@@ -318,24 +341,25 @@ app.use((err, req, res, next) => {
 //для получения всех существующих статей
 app.get('/articles', (req, res) => {
   const query = `
-    SELECT 
-      a.id, 
-      a.title, 
-      a.text, 
-      a.date_of_publication, 
-      a.author_id, 
-      a.rating,
-      GROUP_CONCAT(t.name SEPARATOR ', ') AS themes
-    FROM 
-      article_in_storage a
-    LEFT JOIN 
-      article_have_topic aht ON a.id = aht.article_id
-    LEFT JOIN 
-      topics t ON aht.theme_id = t.id
-    GROUP BY 
-      a.id
-    ORDER BY 
-      a.date_of_publication DESC
+  SELECT 
+    a.id, 
+    a.title, 
+    a.text, 
+    a.date_of_publication, 
+    a.author_id, 
+    a.rating,
+    GROUP_CONCAT(DISTINCT t.name SEPARATOR ', ') AS themes,
+    (SELECT ap.file_path FROM article_preview ap WHERE ap.article_id = a.id LIMIT 1) AS preview_path
+  FROM 
+    article_in_storage a
+  LEFT JOIN 
+    article_have_topic aht ON a.id = aht.article_id
+  LEFT JOIN 
+    topics t ON aht.theme_id = t.id
+  GROUP BY 
+    a.id, a.title, a.text, a.date_of_publication, a.author_id, a.rating
+  ORDER BY 
+    a.date_of_publication DESC
   `;
 
   connection.query(query, (error, results) => {
@@ -344,7 +368,6 @@ app.get('/articles', (req, res) => {
       return res.status(500).json({ error: 'Ошибка при получении статей' });
     }
 
-    // Преобразуем строку с темами в массив
     const articles = results.map(article => ({
       ...article,
       themes: article.themes ? article.themes.split(', ') : []
@@ -354,7 +377,7 @@ app.get('/articles', (req, res) => {
   });
 });
 
-// Маршрут для получения конкретной статьи по ID (заполняем ArticlePage)
+// Маршрут для получения конкретной статьи по ID
 app.get('/articles/:id', (req, res) => {
   const articleId = req.params.id;
 
@@ -478,6 +501,158 @@ app.post('/articles/:id/comments', (req, res) => {
       // Добавляем дату на стороне сервера
       createdAt: new Date().toISOString()
     });
+  });
+});
+
+//обработка статических файлов
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Маршрут для получения рейтинга комментария
+// Изменяем маршрут для получения рейтинга комментария
+app.get('/comments/:id/rating', (req, res) => {
+  const commentId = req.params.id;
+  const userId = req.query.userId; // Добавляем параметр userId из query
+
+  // Запрос для общего рейтинга
+  const ratingQuery = `
+    SELECT 
+      SUM(grade) AS totalRating,
+      COUNT(*) AS votesCount
+    FROM comments_rating
+    WHERE commentId = ?
+  `;
+
+  // Запрос для голоса текущего пользователя
+  const userVoteQuery = `
+    SELECT grade FROM comments_rating 
+    WHERE commentId = ? AND userId = ?
+  `;
+
+  connection.query(ratingQuery, [commentId], (error, ratingResults) => {
+    if (error) {
+      console.error('Ошибка при получении рейтинга:', error);
+      return res.status(500).json({ error: 'Ошибка при получении рейтинга' });
+    }
+    
+    const ratingData = ratingResults[0] || { totalRating: 0, votesCount: 0 };
+    
+    if (!userId) {
+      return res.json({
+        totalRating: ratingData.totalRating || 0,
+        votesCount: ratingData.votesCount || 0,
+        userGrade: 0
+      });
+    }
+
+    // Получаем голос пользователя, если userId передан
+    connection.query(userVoteQuery, [commentId, userId], (error, userResults) => {
+      if (error) {
+        console.error('Ошибка при получении голоса пользователя:', error);
+        return res.status(500).json({ error: 'Ошибка при получении голоса пользователя' });
+      }
+
+      res.json({
+        totalRating: ratingData.totalRating || 0,
+        votesCount: ratingData.votesCount || 0,
+        userGrade: userResults.length > 0 ? userResults[0].grade : 0
+      });
+    });
+  });
+});
+
+// Маршрут для голосования за комментарий
+app.post('/comments/:id/rate', (req, res) => {
+  const commentId = req.params.id;
+  const { userId, grade } = req.body;
+
+  if (userId === undefined || grade === undefined) {
+    return res.status(400).json({ error: 'Необходимо указать userId и grade' });
+  }
+
+  if (grade !== 1 && grade !== -1) {
+    return res.status(400).json({ error: 'Grade должен быть 1 или -1' });
+  }
+
+  // Начинаем транзакцию
+  connection.beginTransaction(err => {
+    if (err) {
+      console.error('Ошибка начала транзакции:', err);
+      return res.status(500).json({ error: 'Ошибка сервера' });
+    }
+
+    // 1. Проверяем, голосовал ли уже пользователь
+    connection.query(
+      'SELECT grade FROM comments_rating WHERE userId = ? AND commentId = ?',
+      [userId, commentId],
+      (error, results) => {
+        if (error) {
+          return connection.rollback(() => {
+            console.error('Ошибка проверки голоса:', error);
+            res.status(500).json({ error: 'Ошибка при проверке голоса' });
+          });
+        }
+
+        // Если пользователь уже голосовал
+        if (results.length > 0) {
+          const currentGrade = results[0].grade;
+          
+          // Если голос такой же, отменяем
+          if (currentGrade === grade) {
+            return connection.rollback(() => {
+              res.status(400).json({ error: 'Вы уже проголосовали таким же образом' });
+            });
+          }
+          
+          // Если голос противоположный, обновляем
+          connection.query(
+            'UPDATE comments_rating SET grade = ? WHERE userId = ? AND commentId = ?',
+            [grade, userId, commentId],
+            (error) => {
+              if (error) {
+                return connection.rollback(() => {
+                  console.error('Ошибка обновления голоса:', error);
+                  res.status(500).json({ error: 'Ошибка при обновлении голоса' });
+                });
+              }
+              
+              connection.commit(err => {
+                if (err) {
+                  return connection.rollback(() => {
+                    console.error('Ошибка коммита транзакции:', err);
+                    res.status(500).json({ error: 'Ошибка при сохранении голоса' });
+                  });
+                }
+                res.json({ success: true, message: 'Голос обновлен' });
+              });
+            }
+          );
+        } else {
+          // Если пользователь еще не голосовал, добавляем новый голос
+          connection.query(
+            'INSERT INTO comments_rating (userId, commentId, grade) VALUES (?, ?, ?)',
+            [userId, commentId, grade],
+            (error) => {
+              if (error) {
+                return connection.rollback(() => {
+                  console.error('Ошибка добавления голоса:', error);
+                  res.status(500).json({ error: 'Ошибка при добавлении голоса' });
+                });
+              }
+              
+              connection.commit(err => {
+                if (err) {
+                  return connection.rollback(() => {
+                    console.error('Ошибка коммита транзакции:', err);
+                    res.status(500).json({ error: 'Ошибка при сохранении голоса' });
+                  });
+                }
+                res.json({ success: true, message: 'Голос сохранен' });
+              });
+            }
+          );
+        }
+      }
+    );
   });
 });
 

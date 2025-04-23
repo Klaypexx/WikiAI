@@ -35,7 +35,6 @@ const LogInForm = () => {
 				});
 
 				if (checkUserResponse.data.exists) {
-					console.log('Пользователь существует');
                     const getUserId = await axios.post('http://localhost:3001/get-id', {
 						login: values.login,
 					  }, {
@@ -45,6 +44,15 @@ const LogInForm = () => {
 					  });
 					  if (getUserId.data.exists) {
 						setUserId(getUserId.data.id);
+
+						// Получаем данные пользователя, включая имя
+						const userResponse = await axios.post('http://localhost:3001/get-user', {
+							id: getUserId.data.id,
+						});
+						if (userResponse.data) {
+							// Сохраняем имя пользователя в localStorage
+							localStorage.setItem('userName', userResponse.data.name);
+						}
 						// Сохраняем токен (в данном случае используем id как токен)
 						localStorage.setItem('authToken', getUserId.data.id.toString());
 					  }

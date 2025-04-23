@@ -12,7 +12,7 @@
 }
 
 .backgroundArticle {
-    background-image: url(../../resources/Article/backgroundArticle.png);
+    /* background-image: url(../../resources/Article/backgroundArticle.png); */
     background-size: 20vh;
     background-repeat: no-repeat;
     background-position: center;
@@ -46,6 +46,8 @@
 }
 
 .articleDescription {
+    display: flex;
+    align-items: center;
     width: 53%;
     padding: 0 5px;
     text-align: justify;
