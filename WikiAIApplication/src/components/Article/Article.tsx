@@ -1,6 +1,7 @@
 import style from "./Article.module.css"
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useUser } from '../../Context/UserContext';
 
 interface ArticleProps {
     id: number;
@@ -13,6 +14,8 @@ interface ArticleProps {
 function Article({id, title, text, themes = [], previewPath}: ArticleProps) {
     //загружаем картинку
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [rating, setRating] = useState<{totalRating: number, userGrade: number}>({totalRating: 0, userGrade: 0});
+    const { userId } = useUser();
     // Обрезаем текст до 200 символов и добавляем многоточие, если текст длиннее
     const truncatedText = text.length > 200 
     ? `${text.substring(0, 200)}...` 
@@ -24,10 +27,52 @@ function Article({id, title, text, themes = [], previewPath}: ArticleProps) {
             const normalizedPath = previewPath
                 .replace(/\\/g, '/') // Заменяем \ на /
                 .replace(/^.*\/uploads\/articles\//, ''); // Удаляем часть пути до uploads/articles/
-            
             setImageUrl(`http://localhost:3001/uploads/articles/${normalizedPath}`);
         }
-    }, [previewPath]);
+        //Загружаем рейтинг
+        fetchArticleRating();
+    }, [previewPath, userId]);
+
+    const fetchArticleRating = async () => {
+        try {
+            const url = userId 
+                ? `http://localhost:3001/articles/${id}/rating?userId=${userId}`
+                : `http://localhost:3001/articles/${id}/rating`;
+                
+            const response = await fetch(url);
+            const data = await response.json();
+            setRating({
+                totalRating: data.totalRating || 0,
+                userGrade: data.userGrade || 0
+            });
+        } catch (err) {
+            console.error('Ошибка загрузки рейтинга:', err);
+        }
+    };
+
+    const handleVote = async (grade: number) => {
+        if (!userId) return;
+        
+        try {
+            const response = await fetch(`http://localhost:3001/articles/${id}/rate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    grade: grade
+                })
+            });
+            
+            if (!response.ok) throw new Error('Ошибка сервера');
+            await fetchArticleRating();
+        } catch (err) {
+            console.error('Ошибка:', err);
+            alert('Вы уже голосовали за этот пункт');
+        }
+    };
 
     return (
         <div className={style.article} >
@@ -46,7 +91,28 @@ function Article({id, title, text, themes = [], previewPath}: ArticleProps) {
             </div>
             <div className={style.articleBase}>
                 <Link to={`/article/${id}`} className={style.articleHeader}>{title}</Link>
-                <p className={style.articleTheme}>{themes.join(" + ")}</p>                
+                {/* <p className={style.articleTheme}>{themes.join(" + ")}</p> */}
+                <p className={style.articleTheme}>
+                    {themes.slice(0, 9).join(" + ")}
+                    {themes.length > 9 && (
+                        <span className={style.moreThemes}> + ещё {themes.length - 9}</span>
+                    )}
+                </p>
+                <div className={style.articleRating}>
+                    <button 
+                        onClick={() => handleVote(1)}
+                        disabled={!userId || rating.userGrade === 1}
+                    >
+                        ↑
+                    </button>
+                    <span>{rating.totalRating}</span>
+                    <button 
+                        onClick={() => handleVote(-1)}
+                        disabled={!userId || rating.userGrade === -1}
+                    >
+                        ↓
+                    </button>
+                </div>                
             </div>
             <div className={style.articleDescription}>
                 <p className={style.articleText}>{truncatedText}</p>

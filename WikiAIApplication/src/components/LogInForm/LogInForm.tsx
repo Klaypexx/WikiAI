@@ -36,7 +36,9 @@ const LogInForm = () => {
 				});
 				
 				if (getUserId.data.exists) {
-				  setUserId(getUserId.data.id);
+				  //setUserId(getUserId.data.id);
+				  setUserId(getUserId.data.id.toString());
+				  localStorage.setItem('userId', getUserId.data.id.toString());
 				  const userResponse = await axios.post('http://localhost:3001/get-user', {
 					id: getUserId.data.id,
 				  });

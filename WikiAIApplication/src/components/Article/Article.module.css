@@ -60,3 +60,33 @@
     font-family: "Comfortaa", sans-serif;
     word-break: break-all;
 }
+
+/*рейтинг*/
+.articleRating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.articleRating button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.articleRating button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.articleRating span {
+    font-weight: bold;
+}
+
+/*темы*/
+.moreThemes {
+    color: #a65c24;
+    position: relative;
+}

@@ -657,6 +657,153 @@ app.post('/comments/:id/rate', (req, res) => {
   });
 });
 
+// Маршрут для получения рейтинга статьи
+app.get('/articles/:id/rating', (req, res) => {
+  const articleId = req.params.id;
+  const userId = req.query.userId;
+
+  // Запрос для общего рейтинга
+  const ratingQuery = `
+    SELECT 
+      SUM(CASE WHEN grade = '+' THEN 1 ELSE -1 END) AS totalRating,
+      COUNT(*) AS votesCount
+    FROM article_rating
+    WHERE articleId = ?
+  `;
+
+  // Запрос для голоса текущего пользователя
+  const userVoteQuery = `
+    SELECT grade FROM article_rating 
+    WHERE articleId = ? AND userId = ?
+  `;
+
+  connection.query(ratingQuery, [articleId], (error, ratingResults) => {
+    if (error) {
+      console.error('Ошибка при получении рейтинга статьи:', error);
+      return res.status(500).json({ error: 'Ошибка при получении рейтинга статьи' });
+    }
+    
+    const ratingData = ratingResults[0] || { totalRating: 0, votesCount: 0 };
+    
+    if (!userId) {
+      return res.json({
+        totalRating: ratingData.totalRating || 0,
+        votesCount: ratingData.votesCount || 0,
+        userGrade: 0
+      });
+    }
+
+    connection.query(userVoteQuery, [articleId, userId], (error, userResults) => {
+      if (error) {
+        console.error('Ошибка при получении голоса пользователя:', error);
+        return res.status(500).json({ error: 'Ошибка при получении голоса пользователя' });
+      }
+
+      res.json({
+        totalRating: ratingData.totalRating || 0,
+        votesCount: ratingData.votesCount || 0,
+        userGrade: userResults.length > 0 ? (userResults[0].grade === '+' ? 1 : -1) : 0
+      });
+    });
+  });
+});
+
+// Маршрут для голосования за статью
+app.post('/articles/:id/rate', (req, res) => {
+  const articleId = req.params.id;
+  const { userId, grade } = req.body;
+
+  if (userId === undefined || grade === undefined) {
+    return res.status(400).json({ error: 'Необходимо указать userId и grade' });
+  }
+
+  if (grade !== 1 && grade !== -1) {
+    return res.status(400).json({ error: 'Grade должен быть 1 или -1' });
+  }
+
+  const gradeValue = grade === 1 ? '+' : '-';
+
+  connection.beginTransaction(err => {
+    if (err) {
+      console.error('Ошибка начала транзакции:', err);
+      return res.status(500).json({ error: 'Ошибка сервера' });
+    }
+
+    // Проверяем, голосовал ли уже пользователь
+    connection.query(
+      'SELECT grade FROM article_rating WHERE userId = ? AND articleId = ?',
+      [userId, articleId],
+      (error, results) => {
+        if (error) {
+          return connection.rollback(() => {
+            console.error('Ошибка проверки голоса:', error);
+            res.status(500).json({ error: 'Ошибка при проверке голоса' });
+          });
+        }
+
+        if (results.length > 0) {
+          const currentGrade = results[0].grade;
+          
+          // Если голос такой же, отменяем
+          if ((currentGrade === '+' && grade === 1) || (currentGrade === '-' && grade === -1)) {
+            return connection.rollback(() => {
+              res.status(400).json({ error: 'Вы уже проголосовали таким же образом' });
+            });
+          }
+          
+          // Обновляем голос
+          connection.query(
+            'UPDATE article_rating SET grade = ? WHERE userId = ? AND articleId = ?',
+            [gradeValue, userId, articleId],
+            (error) => {
+              if (error) {
+                return connection.rollback(() => {
+                  console.error('Ошибка обновления голоса:', error);
+                  res.status(500).json({ error: 'Ошибка при обновлении голоса' });
+                });
+              }
+              
+              connection.commit(err => {
+                if (err) {
+                  return connection.rollback(() => {
+                    console.error('Ошибка коммита транзакции:', err);
+                    res.status(500).json({ error: 'Ошибка при сохранении голоса' });
+                  });
+                }
+                res.json({ success: true, message: 'Голос обновлен' });
+              });
+            }
+          );
+        } else {
+          // Добавляем новый голос
+          connection.query(
+            'INSERT INTO article_rating (userId, articleId, grade) VALUES (?, ?, ?)',
+            [userId, articleId, gradeValue],
+            (error) => {
+              if (error) {
+                return connection.rollback(() => {
+                  console.error('Ошибка добавления голоса:', error);
+                  res.status(500).json({ error: 'Ошибка при добавлении голоса' });
+                });
+              }
+              
+              connection.commit(err => {
+                if (err) {
+                  return connection.rollback(() => {
+                    console.error('Ошибка коммита транзакции:', err);
+                    res.status(500).json({ error: 'Ошибка при сохранении голоса' });
+                  });
+                }
+                res.json({ success: true, message: 'Голос сохранен' });
+              });
+            }
+          );
+        }
+      }
+    );
+  });
+});
+
 // Запуск сервера
 app.listen(port, () => {
   console.log(`Сервер запущен на http://localhost:${port}`);

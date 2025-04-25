@@ -1,7 +1,6 @@
 ﻿import style from "./Menu.module.css"
 import { Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext/AuthContext';
-import { useEffect, useState } from 'react';
 
 function Menu() {
     const { isAuthenticated, logout, userName } = useAuth();

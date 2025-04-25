@@ -20,6 +20,7 @@
   color: #fff;
   margin-bottom: 30px;
   min-height: 400px;
+  word-break: break-all;
 }
 
 .commentSection {
@@ -91,7 +92,7 @@
   text-align: right;
 }
 
-/* добавил */
+/* Рейтинг коммента */
 .commentRating {
   display: flex;
   align-items: center;
@@ -123,4 +124,29 @@
   min-width: 20px;
   text-align: center;
   font-weight: bold;
+}
+
+/*рейтинг статьи*/
+.articleRating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.articleRating button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.articleRating button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.articleRating span {
+  font-weight: bold;
+  font-size: 18px;
 }

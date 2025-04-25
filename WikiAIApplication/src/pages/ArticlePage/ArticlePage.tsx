@@ -10,6 +10,8 @@ interface ArticleData {
   date_of_publication: string;
   author_id: number;
   rating: number;
+  totalRating?: number;
+  userGrade?: number;
 }
 
 interface Comment {
@@ -31,7 +33,8 @@ const ArticlePage = () => {
     const [newComment, setNewComment] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentUser, setCurrentUser] = useState<{id: number, name: string} | null>(null);
-  
+    const [articleRating, setArticleRating] = useState<{totalRating: number, userGrade: number}>({totalRating: 0, userGrade: 0});
+
     useEffect(() => {
         const checkAuth = async () => {
           const token = localStorage.getItem('authToken');
@@ -59,6 +62,29 @@ const ArticlePage = () => {
         fetchComments();
     }, [id]);
 
+    useEffect(() => {
+      if (article?.id) {
+          fetchArticleRating();
+      }
+    }, [article?.id, currentUser?.id]);
+
+    const fetchArticleRating = async () => {
+      try {
+          const url = currentUser?.id 
+              ? `http://localhost:3001/articles/${id}/rating?userId=${currentUser.id}`
+              : `http://localhost:3001/articles/${id}/rating`;
+              
+          const response = await fetch(url);
+          const data = await response.json();
+          setArticleRating({
+              totalRating: data.totalRating || 0,
+              userGrade: data.userGrade || 0
+          });
+      } catch (err) {
+          console.error('Ошибка загрузки рейтинга статьи:', err);
+      }
+    };
+
     const fetchArticle = async () => {
       try {
         const response = await fetch(`http://localhost:3001/articles/${id}`);
@@ -71,6 +97,30 @@ const ArticlePage = () => {
         setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
       } finally {
         setLoading(false);
+      }
+    };
+
+    const handleArticleVote = async (grade: number) => {
+      if (!currentUser) return;
+      
+      try {
+          const response = await fetch(`http://localhost:3001/articles/${id}/rate`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+              },
+              body: JSON.stringify({
+                  userId: currentUser.id,
+                  grade: grade
+              })
+          });
+          
+          if (!response.ok) throw new Error('Ошибка сервера');
+          await fetchArticleRating();
+      } catch (err) {
+          console.error('Ошибка:', err);
+          alert('Вы уже голосовали за этот пункт');
       }
     };
 
@@ -189,6 +239,21 @@ const ArticlePage = () => {
           {article.themes && article.themes.length > 0 && (
             <p>Темы: {article.themes.join(', ')}</p>
           )}
+          <div className={style.articleRating}>
+            <button 
+                onClick={() => handleArticleVote(1)}
+                disabled={!isAuthenticated || articleRating.userGrade === 1}
+            >
+                ↑
+            </button>
+            <span>{articleRating.totalRating}</span>
+            <button 
+                onClick={() => handleArticleVote(-1)}
+                disabled={!isAuthenticated || articleRating.userGrade === -1}
+            >
+                ↓
+            </button>
+        </div>
         </div>
   
         <div className={style.commentSection}>
