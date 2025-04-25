@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'; // Импортируем useNav
 import { useUser } from '../../Context/UserContext';
 
 const LogInForm = () => {
-	const { login } = useAuth(); // Используем контекст
+	const { login, setUserName } = useAuth(); // Используем контекст
 	const navigate = useNavigate(); // Хук для навигации
 	const { userId, setUserId } = useUser();
 
@@ -26,48 +26,38 @@ const LogInForm = () => {
 		}),
 		onSubmit: async (values) => {
 			try {
-				const checkUserResponse = await axios.post('http://localhost:3001/check-user', {
-					login: values.login,
-				}, {
-					headers: {
-						'Content-Type': 'application/json',
-					},
+			  const checkUserResponse = await axios.post('http://localhost:3001/check-user', {
+				login: values.login,
+			  });
+		  
+			  if (checkUserResponse.data.exists) {
+				const getUserId = await axios.post('http://localhost:3001/get-id', {
+				  login: values.login,
 				});
-
-				if (checkUserResponse.data.exists) {
-                    const getUserId = await axios.post('http://localhost:3001/get-id', {
-						login: values.login,
-					  }, {
-						headers: {
-						  'Content-Type': 'application/json',
-						},
-					  });
-					  if (getUserId.data.exists) {
-						setUserId(getUserId.data.id);
-
-						// Получаем данные пользователя, включая имя
-						const userResponse = await axios.post('http://localhost:3001/get-user', {
-							id: getUserId.data.id,
-						});
-						if (userResponse.data) {
-							// Сохраняем имя пользователя в localStorage
-							localStorage.setItem('userName', userResponse.data.name);
-						}
-						// Сохраняем токен (в данном случае используем id как токен)
-						localStorage.setItem('authToken', getUserId.data.id.toString());
-					  }
-					  else {
-						alert('Произошла ошибка на сервере')
-					  }
-					login();//метод AuthContext (чото там делает крч)
-					navigate('/my_storage'); // Перенаправляем на /my_storage
+				
+				if (getUserId.data.exists) {
+				  setUserId(getUserId.data.id);
+				  const userResponse = await axios.post('http://localhost:3001/get-user', {
+					id: getUserId.data.id,
+				  });
+				  
+				  if (userResponse.data) {
+					localStorage.setItem('userName', userResponse.data.name);
+					setUserName(userResponse.data.name); // Обновляем имя в контексте
+				  }
+				  
+				  localStorage.setItem('authToken', getUserId.data.id.toString());
+				  login(getUserId.data.id.toString()); // Передаем токен в login
+				  navigate('/my_storage');
 				} else {
-					console.log('Пользователь не существует');
-					alert('Пользователь не существует');
+				  alert('Произошла ошибка на сервере');
 				}
+			  } else {
+				alert('Пользователь не существует');
+			  }
 			} catch(error) {
-				console.error('Ошибка при логировании', error);
-				alert('Произошла ошибка при логировании');
+			  console.error('Ошибка при логировании', error);
+			  alert('Произошла ошибка при логировании');
 			}
 		},
 	});

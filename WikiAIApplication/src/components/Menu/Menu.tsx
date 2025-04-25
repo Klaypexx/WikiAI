@@ -4,18 +4,7 @@ import { useAuth } from '../AuthContext/AuthContext';
 import { useEffect, useState } from 'react';
 
 function Menu() {
-    const { isAuthenticated, logout } = useAuth();
-    const [userName, setUserName] = useState('');
-
-    useEffect(() => {
-        if (isAuthenticated) {
-            // Получаем имя пользователя из localStorage
-            const name = localStorage.getItem('userName');
-            if (name) {
-                setUserName(name);
-            }
-        }
-    }, [isAuthenticated]);
+    const { isAuthenticated, logout, userName } = useAuth();
 
     return(
         <nav className={style.menu}>
@@ -25,15 +14,15 @@ function Menu() {
                 <Link to = "/my_storage" className={style.buttonPanel}>Моё хранилище</Link>
                 <Link to = "/write_state" className={style.buttonPanel}>Написать статью</Link>   
             </div>
-            {isAuthenticated ? ( // Условный рендеринг
+            {isAuthenticated ? (
                 <div className={style.menuUserAuthorization}>
-                <div className={style.menuUser}>{userName}</div>
-                <button onClick={logout}>Выйти</button> {/* Кнопка выхода */}
+                    <div className={style.menuUser}>{userName}</div>
+                    <button onClick={logout}>Выйти</button>
                 </div>
             ) : (
                 <div className={style.menuAuthorization}>
-                <Link to="/LogIn" className={style.buttonAuthorization}>Log In</Link>
-                <Link to="/SignUp" className={style.buttonAuthorization}>Sign Up</Link>
+                    <Link to="/LogIn" className={style.buttonAuthorization}>Log In</Link>
+                    <Link to="/SignUp" className={style.buttonAuthorization}>Sign Up</Link>
                 </div>
             )}
         </nav>

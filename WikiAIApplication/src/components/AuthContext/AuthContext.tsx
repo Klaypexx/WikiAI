@@ -1,38 +1,68 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: () => void;
+  login: (token: string) => void;
   logout: () => void;
+  userName: string;
+  setUserName: (name: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    // Восстанавливаем состояние из localStorage при загрузке
-    const savedAuth = localStorage.getItem('isAuthenticated');
-    return savedAuth ? JSON.parse(savedAuth) : false;
-  });
 
-  const login = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userName, setUserName] = useState<string>('');
+  const navigate = useNavigate();
+
+  // Проверяем аутентификацию при загрузке
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      // Проверяем токен на сервере
+      axios.get('http://localhost:3001/check-auth', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        setIsAuthenticated(true);
+        const name = localStorage.getItem('userName') || '';
+        setUserName(name);
+      })
+      .catch(() => {
+        // Если токен невалидный, очищаем хранилище
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userName');
+      });
+    }
+  }, []);
+
+  const login = (token: string) => {
     setIsAuthenticated(true);
-    localStorage.setItem('isAuthenticated', JSON.stringify(true)); // Сохраняем в localStorage
+    localStorage.setItem('authToken', token);
   };
-  
-  const navigate = useNavigate();//кидаем на главную страницу
 
   const logout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated'); // Удаляем из localStorage 
-    localStorage.removeItem('authToken'); // Удаляем токен при выходе
+    setUserName('');
+    localStorage.removeItem('authToken');
     localStorage.removeItem('userName');
     navigate('/');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      login, 
+      logout,
+      userName,
+      setUserName
+    }}>
       {children}
     </AuthContext.Provider>
   );

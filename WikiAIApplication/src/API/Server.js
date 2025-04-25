@@ -43,6 +43,7 @@ app.get('/data', (req, res) => {
   });
 });
 
+// Проверка существования пользователя
 app.post('/check-user', (req, res) => {
   console.log('Тело запроса:', req.body); // Логирование тела запроса
   const { login } = req.body;
