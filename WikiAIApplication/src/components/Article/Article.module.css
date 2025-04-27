@@ -12,7 +12,7 @@
 }
 
 .backgroundArticle {
-    background-image: url(../../resources/Article/backgroundArticle.png);
+    /* background-image: url(../../resources/Article/backgroundArticle.png); */
     background-size: 20vh;
     background-repeat: no-repeat;
     background-position: center;
@@ -46,6 +46,8 @@
 }
 
 .articleDescription {
+    display: flex;
+    align-items: center;
     width: 53%;
     padding: 0 5px;
     text-align: justify;
@@ -56,4 +58,35 @@
     font-size: 16px;
     font-weight: 500;
     font-family: "Comfortaa", sans-serif;
+    word-break: break-all;
+}
+
+/*рейтинг*/
+.articleRating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.articleRating button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.articleRating button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.articleRating span {
+    font-weight: bold;
+}
+
+/*темы*/
+.moreThemes {
+    color: #a65c24;
+    position: relative;
 }

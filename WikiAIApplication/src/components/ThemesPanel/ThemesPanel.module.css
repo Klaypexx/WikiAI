@@ -1,0 +1,50 @@
+.themesWrapper {
+    margin: 0 20px;
+}
+
+.errorMsg {
+    font-weight: bold;
+}
+
+.themesContainer {
+    margin: 1rem 0;
+  }
+  
+  .themesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .themeItem {
+    display: flex;
+    align-items: center;
+  }
+  
+  .themeCheckbox {
+    margin-right: 0.5rem;
+  }
+  
+  .themeLabel {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .themeLabel:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .loading {
+    padding: 1rem;
+    text-align: center;
+    color: #666;
+  }
+  
+  .error {
+    padding: 1rem;
+    color: #d32f2f;
+    background-color: #fde8e8;
+    border-radius: 4px;
+  }

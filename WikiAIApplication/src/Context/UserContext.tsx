@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface UserContextType {
   userId: string | null;
@@ -8,7 +8,19 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(() => {
+    // При инициализации пытаемся получить userId из localStorage
+    return localStorage.getItem('userId') || null;
+  });
+
+  // При изменении userId сохраняем его в localStorage
+  useEffect(() => {
+    if (userId) {
+      localStorage.setItem('userId', userId);
+    } else {
+      localStorage.removeItem('userId');
+    }
+  }, [userId]);
 
   return (
     <UserContext.Provider value={{ userId, setUserId }}>

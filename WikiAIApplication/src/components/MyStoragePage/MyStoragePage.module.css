@@ -28,6 +28,8 @@
     font-size: 18px;
     font-weight: 400;
     font-family: "Nunito", sans-serif;
+    color: #081538;
+    background: #dadada;
 }
 
 .storagePageSearch:focus {
@@ -114,7 +116,7 @@
 /* правая сторона */
 .storagePageList {
     width: 62rem;
-    height: 85vh;
+    min-height: 85vh;
     border: 1px solid #8a5f5f;
     border-radius: 2rem 2rem 0 0;
     display: flex;
@@ -123,4 +125,10 @@
     flex-wrap: nowrap;
     justify-content: flex-start;
     padding-top: 1rem;
+}
+
+.activeTheme {
+    color: #88a5de;
+    font-weight: 900;
+    text-decoration: underline;
 }

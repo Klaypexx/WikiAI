@@ -1,16 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import style from "./ArticleForm.module.css";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers, FieldArray} from 'formik';
 import * as Yup from 'yup';
+import { useUser } from '../../Context/UserContext'
+import axios from 'axios';
+import ThemeSelector from '../ThemesPanel/ThemesPanel';
 
 interface ArticleFormValues {
   title: string;
   content: string;
-  themes: string[];
+  themes: number[];
   previewImage: File | null;
 }
 
+interface Theme {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 const WriteArticleForm: React.FC = () => {
+  const { userId } = useUser(); // Получаем userId из контекста
+  
   const initialValues: ArticleFormValues = {
     title: '',
     content: '',
@@ -24,30 +35,41 @@ const WriteArticleForm: React.FC = () => {
     themes: Yup.array().of(Yup.string()).min(1, 'Выберите хотя бы одну тему'),
   });
 
-  const onSubmit = (values: ArticleFormValues, actions: FormikHelpers<ArticleFormValues>) => {
-    console.log('Form data', values);
-    // Здесь можно добавить логику для отправки данных на сервер
-    actions.setSubmitting(false);
-  };
+  const onSubmit = async (values: ArticleFormValues, actions: FormikHelpers<ArticleFormValues>) => {
+    try {
+      const formData = new FormData();
+      formData.append('title', values.title);
+      formData.append('content', values.content);
+      if (userId === null) {
+        console.log("Автор не отправлен");
+      }
+      else
+      {
+        console.log("Автор отправлен");
+        formData.append('author', userId.toString());
+      }
+      formData.append('themes', values.themes.join(','));
+      if (values.previewImage) {
+        formData.append('preview', values.previewImage);
+      }
 
-  const themes = [
-    { value: 'technology', label: 'Технологии' },
-    { value: 'science', label: 'Наука' },
-    { value: 'health', label: 'Здоровье' },
-    { value: 'education', label: 'Образование' },
-    { value: 'history', label: 'История' },
-    { value: 'cosmetology', label: 'Косметология' },
-    { value: 'biology', label: 'Биология' },
-    { value: 'mathematics', label: 'Математика' },
-    { value: 'programming', label: 'Программирование' },
-    { value: 'design', label: 'Дизайн' },
-    { value: 'sociology', label: 'Социология' },
-    { value: 'phylosofy', label: 'Философия' },
-    { value: 'construct', label: 'Машиностроение' },
-    { value: 'Mechatronics', label: 'Мехатроника' },
-    { value: 'cooking', label: 'Кулинария' },
-    { value: 'medicine', label: 'Медицина' },
-  ];
+      const response = await axios.post('http://localhost:3001/post-article', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.status === 201) {
+        alert('Статья успешно опубликована!');
+        actions.resetForm();
+      }
+    } catch (error) {
+      console.error('Ошибка при отправке статьи:', error);
+      alert('Произошла ошибка при публикации статьи');
+    } finally {
+      actions.setSubmitting(false);
+    }
+  };
 
   return (
     <div className={style.pageСontainer}>
@@ -98,26 +120,8 @@ const WriteArticleForm: React.FC = () => {
                   </div>
                   <div className={style.themesContainer}>
                     <label>Темы</label>
-                    <FieldArray name="themes">
-                        {({ }) => (
-                            <div className={style.themesWrapper}>
-                                <div className="themes-list">
-                                    {themes.map((theme) => (
-                                        <div key={theme.value} className="theme-item">
-                                            <Field
-                                                type="checkbox"
-                                                name="themes"
-                                                value={theme.value}
-                                                id={theme.value}
-                                            />
-                                            <label htmlFor={theme.value}>{theme.label}</label>
-                                        </div>
-                                     ))}
-                                </div>
-                                 <ErrorMessage name="themes" component="div" className={style.errorMsg} />
-                            </div>
-                        )}
-                    </FieldArray>
+                    <ThemeSelector name="themes" />
+                    <ErrorMessage name="themes" component="div" className={style.errorMsg} />
                   </div>
               </div>
               <button type="submit" className={style.submitButton}>
